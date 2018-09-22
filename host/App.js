@@ -8,6 +8,7 @@ import Dialog from 'material-ui/Dialog'
 import Divider from 'material-ui/Divider'
 import TextField from 'material-ui/TextField'
 import { Tabs, Tab } from 'material-ui/Tabs'
+import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 
 import SwipeableViews from 'react-swipeable-views'
 
@@ -22,13 +23,14 @@ import { getPage, getExperimentType } from '../util/index'
 import { submitMode } from './actions'
 import { updateSetting, updateText, visit } from './actions'
 
-import { ReadJSON } from '../util/ReadJSON'
+import { ReadJSON, InsertVariable } from '../util/ReadJSON'
 
 const pages = ["wait", "description", "auction", "result"]
 const ex_types = ["simple", "real"]
 
-const mapStateToProps = ({ mode, loading, buyerBids, sellerBids, deals, highestBid, lowestBid, users, screenPage, ex_type, price_base, price_inc, price_max, price_min, dynamic_text, isFirstVisit, hist }) => ({
+const mapStateToProps = ({ mode,  use_money, loading, buyerBids, sellerBids, deals, highestBid, lowestBid, users, screenPage, ex_type, price_base, price_inc, price_max, price_min, dynamic_text, isFirstVisit, hist }) => ({
   mode,
+  use_money,
   loading,
   buyerBids,
   sellerBids,
@@ -68,6 +70,7 @@ class App extends Component {
       price_inc: this.props.price_inc,
       price_max: this.props.price_max,
       price_min: this.props.price_min,
+      use_money: (this.props.use_money)?this.props.use_money:"suggested"
     })
     this.handleOpenEdit = () => this.setState({
       edit: true,
@@ -84,8 +87,10 @@ class App extends Component {
   }
 
   setting() {
-    const { ex_type, price_base, price_inc, price_max, price_min  } = this.state
-
+    const { dynamic_text } = this.props
+    const { ex_type, price_base, price_inc, price_max, price_min, use_money } = this.state
+    let text = dynamic_text
+    if(!text) text = this.state.dynamic_text
     var buttons = ex_types.map(type => <RaisedButton label={getExperimentType(type)} primary={ex_type == type} onClick={this.handleExChange.bind(this, type)} />)
     return (
       <span>
@@ -116,7 +121,25 @@ class App extends Component {
           floatingLabelText={ReadJSON().static_text["price_max"]}
           onChange={this.handleChangeText.bind(this, 'price_max')}
         /></span>
-         }
+        }
+        {<span>
+          <p>{InsertVariable(ReadJSON().static_text["deal_price"], {}, text["variables"])}</p>
+          <RadioButtonGroup
+            name="deal"
+            valueSelected={use_money}
+            onChange={this.handleChangeRadioButton.bind(this)}
+          >
+            <RadioButton
+              value="suggested"
+              label={InsertVariable(ReadJSON().static_text["suggested"], {}, text["variables"])}
+            />
+            <RadioButton
+              value="suggest"
+              label={InsertVariable(ReadJSON().static_text["suggest"], {}, text["variables"])}
+            />
+          </RadioButtonGroup>
+        </span>
+        }
       </span>
     )
   }
@@ -146,10 +169,16 @@ class App extends Component {
     }
   }
 
+  handleChangeRadioButton(e, value) {
+    this.setState({
+      use_money: value
+    })
+  }
+
   handleCloseSetting() {
     const { dispatch } = this.props
-    const { ex_type, price_base, price_inc, price_max, price_min  } = this.state
-    dispatch(updateSetting({ ex_type: ex_type, price_base: price_base, price_inc: price_inc, price_max: price_max, price_min: price_min }))
+    const { ex_type, price_base, price_inc, price_max, price_min, use_money  } = this.state
+    dispatch(updateSetting({ ex_type: ex_type, price_base: price_base, price_inc: price_inc, price_max: price_max, price_min: price_min, use_money: use_money }))
     this.setState({ setting: false })
   }
 
@@ -327,7 +356,7 @@ class App extends Component {
   }
 
   render() {
-    const { mode, loading, buyerBids, sellerBids, deals, highestBid, lowestBid, users, ex_type, price_base, price_inc, price_max, price_min, dynamic_text } = this.props
+    const { mode, use_money, loading, buyerBids, sellerBids, deals, highestBid, lowestBid, users, ex_type, price_base, price_inc, price_max, price_min, dynamic_text } = this.props
 
     if (this.state.screenPage) {
       return (
@@ -378,6 +407,7 @@ class App extends Component {
             money={0}
             bidded={true}
             dispatch={null}
+            use_money={use_money}
           />
           <Divider
             style={{

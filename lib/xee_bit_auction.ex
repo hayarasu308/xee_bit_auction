@@ -20,6 +20,7 @@ defmodule BitAuction do
     {:ok, %{data: %{
        counter: 0, # For create unique IDs
        mode: "wait",
+       use_money: "suggested",
        participants: %{},
        buyer_bids: [],
        highest_bid: nil,

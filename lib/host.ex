@@ -2,6 +2,7 @@ defmodule BitAuction.Host do
   def filter_data(data) do
     rule = %{
       mode: true,
+      use_money: true,
       participants: "users",
       buyer_bids: {"buyerBids", true},
       seller_bids: {"sellerBids", true},
@@ -80,7 +81,7 @@ defmodule BitAuction.Host do
   end
 
   def update_setting(data, params) do
-    %{data | ex_type: params["ex_type"], price_base: params["price_base"], price_inc: params["price_inc"], price_max: params["price_max"], price_min: params["price_min"]}
+    %{data | ex_type: params["ex_type"], price_base: params["price_base"], price_inc: params["price_inc"], price_max: params["price_max"], price_min: params["price_min"], use_money: params["use_money"]}
   end
 
   def update_text(data, params) do

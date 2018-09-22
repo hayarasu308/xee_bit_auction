@@ -14,6 +14,7 @@ defmodule BitAuction.Participant do
     rule = %{
       user_number: "userNumber",
       mode: true,
+      use_money: true,
       buyer_bids: {"buyerBids", true},
       seller_bids: {"sellerBids", true},
       deals: true,
@@ -126,7 +127,7 @@ defmodule BitAuction.Participant do
         end
     end
   end
-  
+
   def deal(data, id, my_key, partner_key, my_bid, partner_bid, deal_money) do
     now = Timex.format!(Timex.now(), "{ISO:Extended}")
     id2 = partner_bid.participant_id

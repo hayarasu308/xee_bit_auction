@@ -8,7 +8,7 @@ import { Card, CardHeader, CardText } from 'material-ui/Card'
 import { ReadJSON, InsertVariable, LineBreak } from '../util/ReadJSON'
 import { select } from '../participant/actions' 
 
-const BidsTable = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, expanded, dynamic_text, role, money, bidded, dispatch }) => {
+const BidsTable = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, expanded, dynamic_text, role, money, bidded, dispatch, use_money }) => {
   const rows = []
   const length = Math.max.apply(null, [buyerBids, sellerBids, deals].map(a => a.length))
   const maxValue = highestBid ? highestBid.bid : 0
@@ -17,7 +17,10 @@ const BidsTable = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, expand
     return map ? map[key] : null
   }
   function handleOnClick() {
-    dispatch(select({bid: this, deal_money: this.bid }))
+    let deal_money = null
+    if (use_money == "suggested") deal_money = this.bid
+    else if (use_money == "suggest") deal_money = money 
+    dispatch(select({bid: this, deal_money: deal_money }))
   }
 
   const tableValue = (value, type) => {

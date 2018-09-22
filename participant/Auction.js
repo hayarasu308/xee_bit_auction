@@ -11,8 +11,8 @@ import BidForm from './BidForm'
 
 import { ReadJSON, LineBreak, InsertVariable } from '../util/ReadJSON'
 
-const mapStateToProps = ( {personal, buyerBids, sellerBids, deals, highestBid, lowestBid, dynamic_text} ) =>
-Object.assign({}, personal, { buyerBids, sellerBids, deals, highestBid, lowestBid, dynamic_text })
+const mapStateToProps = ( {personal, buyerBids, sellerBids, deals, highestBid, lowestBid, dynamic_text, use_money} ) =>
+Object.assign({}, personal, { buyerBids, sellerBids, deals, highestBid, lowestBid, dynamic_text, use_money })
 
 const Buyer = ({ money, bidded, bid, dealt, deal, dynamic_text }) => {
   if (dealt) {
@@ -68,7 +68,7 @@ const Seller = ({ money, bidded, bid, dealt, deal, dynamic_text }) => {
   }
 }
 
-const Auction = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, role, money, bidded, bid, dealt, deal, dynamic_text, dispatch }) => (
+const Auction = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, role, money, bidded, bid, dealt, deal, dynamic_text, use_money, dispatch }) => (
   <div>
     <Card>
     <CardText>
@@ -94,6 +94,7 @@ const Auction = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, role, mo
       money={bid}
       bidded={bidded}
       dispatch={dispatch}
+      use_money={use_money}
     />
   </div>
 )

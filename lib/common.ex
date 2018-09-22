@@ -1,2 +1,2 @@
-defmodule DoubleAuction.Common do
+defmodule BitAuction.Common do
 end

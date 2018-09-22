@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :xee_double_auction, key: :value
+#     config :xee_bit_auction, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:xee_double_auction, :key)
+#     Application.get_env(:xee_bit_auction, :key)
 #
 # Or configure a 3rd-party app:
 #

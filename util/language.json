@@ -23,7 +23,7 @@
     "your_seller": "あなたは<seller>です。\n<cost>である<money><unit>以上の<price>で販売することができます。"
   },
   "static_text": {
-    "title": "ダブルオークション実験",
+    "title": "ビットオークション実験",
     "pages": [
       "待機",
       "説明",
@@ -63,7 +63,7 @@
     "benefit": "<profit>は<benefit>です。",
     "buyer_suggest": "あなたは<buyer>として<bid><unit>で提案中です。",
     "seller_suggest": "あなたは<seller>として<bid><unit>で提案中です。",
-    "donot_join": "あなたは現在進行中のダブルオークションには参加していません。",
+    "donot_join": "あなたは現在進行中のビットオークションには参加していません。",
     "error_text": [
       "正の整数を入力してください",
       "<budget><unit>以下の<price>で提案して下さい",
@@ -98,8 +98,8 @@
     "price_change": "成立<price>の推移",
     "success_order": "成立順",
     "file": [
-      "double_auction.csv",
-      "Double Auction",
+      "bit_auction.csv",
+      "Bit Auction",
       "Date and time",
       "The number of participants",
       "ID",

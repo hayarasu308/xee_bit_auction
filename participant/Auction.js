@@ -68,7 +68,7 @@ const Seller = ({ money, bidded, bid, dealt, deal, dynamic_text }) => {
   }
 }
 
-const Auction = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, role, money, bidded, bid, dealt, deal, dynamic_text }) => (
+const Auction = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, role, money, bidded, bid, dealt, deal, dynamic_text, dispatch }) => (
   <div>
     <Card>
     <CardText>
@@ -90,6 +90,10 @@ const Auction = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, role, mo
       lowestBid={lowestBid}
       expanded={true}
       dynamic_text={dynamic_text}
+      role={role}
+      money={bid}
+      bidded={bidded}
+      dispatch={dispatch}
     />
   </div>
 )

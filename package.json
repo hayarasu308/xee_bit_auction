@@ -1,5 +1,5 @@
 {
-  "name": "double_auction",
+  "name": "bit_auction",
   "version": "1.0.0",
   "main": "host.js",
   "author": "",
@@ -40,12 +40,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ryo33/xee_double_auction.git"
+    "url": "git+https://github.com/hayarasu308/xee_bit_auction.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ryo33/xee_double_auction/issues"
+    "url": "https://github.com/hayarasu308/xee_bit_auction/issues"
   },
-  "homepage": "https://github.com/ryo33/xee_double_auction#readme",
+  "homepage": "https://github.com/hayarasu308/xee_bit_auction#readme",
   "description": ""
 }

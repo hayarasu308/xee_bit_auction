@@ -21,7 +21,7 @@ class Wait extends Component {
                         <p>{InsertVariable(ReadJSON().static_text["waiting"][3], { user_number: userNumber})}</p>
                     </CardText>
                     <div style={{textAlign: "center"}}>
-                        <CircularProgress size={2}/>
+                        <CircularProgress size={140} thickness={5.0}/>
                     </div>
                 </Card>
             </div>

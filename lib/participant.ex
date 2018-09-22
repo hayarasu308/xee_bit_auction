@@ -1,4 +1,4 @@
-defmodule DoubleAuction.Participant do
+defmodule BitAuction.Participant do
   use Timex
   require Logger
 
@@ -42,32 +42,22 @@ defmodule DoubleAuction.Participant do
   def bid(data, id, bid) do
     old = data
     participant = Map.get(data.participants, id)
-    data = case participant do
+    case participant do
       # Seller
       %{role: "seller", bidded: bidded, bid: previous_bid, money: money, dealt: false} when not is_nil(money) and bid >= money ->
-        data = remove_first(data, id, previous_bid, :lowest_bid, :seller_bids, &set_lowest_bid/1)
-                |> update_bid(id, bid)
-        if not is_nil(data.highest_bid) and bid <= data.highest_bid.bid do
-          deal(data, :highest_bid, :buyer_bids, id, data.highest_bid.bid, &set_highest_bid/1)
-        else
-          bid(data, :lowest_bid, :seller_bids, id, bid, previous_bid, "NEW_SELLER_BIDS", fn most_bid, bid ->
-            bid < most_bid
-          end)
-        end
+        remove_first(data, id, previous_bid, :lowest_bid, :seller_bids, &set_lowest_bid/1)
+          |> update_bid(id, bid)
+          |> bid(:lowest_bid, :seller_bids, id, bid, previous_bid, "NEW_SELLER_BIDS", fn most_bid, bid ->
+              bid < most_bid
+             end)
       # Buyer
       %{role: "buyer", bidded: bidded, bid: previous_bid, money: money, dealt: false} when not is_nil(money) and bid <= money ->
-        data = remove_first(data, id, previous_bid, :highest_bid, :buyer_bids, &set_highest_bid/1)
-                |> update_bid(id, bid)
-        if not is_nil(data.lowest_bid) and bid >= data.lowest_bid.bid do
-          deal(data, :lowest_bid, :seller_bids, id, data.lowest_bid.bid, &set_lowest_bid/1)
-        else
-          bid(data, :highest_bid, :buyer_bids, id, bid, previous_bid, "NEW_BUYER_BIDS", fn most_bid, bid ->
-            bid > most_bid
-          end)
-        end
+        remove_first(data, id, previous_bid, :highest_bid, :buyer_bids, &set_highest_bid/1)
+          |> update_bid(id, bid)
+          |> bid(:highest_bid, :buyer_bids, id, bid, previous_bid, "NEW_BUYER_BIDS", fn most_bid, bid ->
+               bid > most_bid
+             end)
     end
-    IO.inspect data
-    data
   end
 
   defp update_bid(data, id, bid) do
@@ -80,12 +70,15 @@ defmodule DoubleAuction.Participant do
     if previous_bid != nil do
       data = %{data | key => Enum.filter(data[key], fn map ->
         map.participant_id != id
-      end)}
+      end)}   
       if not is_nil(data[bid_key]) and data[bid_key].participant_id == id do
-        data = set.(data)
+        set.(data)
+      else
+        data
       end
+    else
+      data
     end
-    data
   end
 
   def bid(data, bid_key, key, id, bid, previous_bid, action, func) do
@@ -101,6 +94,7 @@ defmodule DoubleAuction.Participant do
     data
     |> Map.update!(:counter, fn x -> x + 1 end)
     |> Map.put(:hist, data.hist ++ [new_hist(id, bid, "bid", nil, Timex.format!(Timex.now(), "{ISO:Extended}"))])
+    |> put_in([:participants, id, :my_bid], new)
   end
 
   def new_bid(id, participant_id, bid) do
@@ -111,17 +105,44 @@ defmodule DoubleAuction.Participant do
     }
   end
 
-  def deal(data, bid_key, partner_key, id, bid, set) do
+  def select(data, id, selected) do
+    %{ "bid" =>  %{ "bid" => bid, "id" => bid_id, "participant_id" => id2 }, "deal_money" => deal_money} = selected
+    partner_bid = %{bid: bid, id: bid_id, participant_id: id2}
+    participant = Map.get(data.participants, id)
+    case participant do
+      # Seller
+      %{role: "seller", bidded: bidded, bid: previous_bid, money: money, my_bid: my_bid, dealt: false} when not is_nil(money) and not is_nil(deal_money) ->
+        if money <= deal_money do
+          deal(data, id, :seller_bids, :buyer_bids, my_bid, partner_bid, deal_money)
+        else
+          data
+        end
+      # Buyer
+      %{role: "buyer", bidded: bidded, bid: previous_bid, money: money, my_bid: my_bid, dealt: false} when not is_nil(money) and not is_nil(deal_money) ->
+        if money >= deal_money do
+          deal(data, id, :buyer_bids, :seller_bids, my_bid, partner_bid, deal_money)
+        else
+          data
+        end
+    end
+  end
+  
+  def deal(data, id, my_key, partner_key, my_bid, partner_bid, deal_money) do
     now = Timex.format!(Timex.now(), "{ISO:Extended}")
-    id2 = data[bid_key].participant_id
-#    new = new_hist(id, bid, true, id2)
-    deals = [new_deal(data.counter, bid, id, id2, now) | data.deals]
-    bids = List.delete(data[partner_key], data[bid_key])
-    data = %{data | :deals => deals, partner_key => bids}
-           |> dealt(id, id2, data[bid_key].bid)
-           |> Map.update!(:counter, fn x -> x + 1 end)
-    data = set.(data)
-    data |> Map.put(:hist, data.hist ++ [new_hist(id, bid, "deal", id2, now)])
+    id2 = partner_bid.participant_id
+    dealt = get_in(data,[:participants, id, :dealt]) or get_in(data,[:participants, id2, :dealt])
+    if !dealt do
+      deals = [new_deal(data.counter, deal_money, id, id2, now) | data.deals]
+      my_bids = List.delete(data[my_key], my_bid)
+      partner_bids = List.delete(data[partner_key], partner_bid)
+      data = %{data | :deals => deals, partner_key => partner_bids, my_key => my_bids}
+            |> dealt(id, id2, deal_money)
+            |> Map.update!(:counter, fn x -> x + 1 end)
+      data = data |> set_highest_bid |> set_lowest_bid
+      data |> Map.put(:hist, data.hist ++ [new_hist(id, deal_money, "deal", id2, now)])
+    else
+      data
+    end
   end
 
   def new_deal(id, bid, participant_id, participant_id2, now) do

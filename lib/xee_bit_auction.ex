@@ -1,11 +1,11 @@
-defmodule DoubleAuction do
+defmodule BitAuction do
   use XeeThemeScript
   require Logger
 
   use Timex
 
-  alias DoubleAuction.Host
-  alias DoubleAuction.Participant
+  alias BitAuction.Host
+  alias BitAuction.Participant
 
   @modes ["wait", "description", "auction", "result"]
 
@@ -41,7 +41,7 @@ defmodule DoubleAuction do
 
   def join(%{participants: participants} = data, id) do
     if not Map.has_key?(participants, id) do
-      participant = %{role: nil, bidded: false, money: nil, bid: nil, dealt: false, deal: nil}
+      participant = %{role: nil, bidded: false, money: nil, bid: nil, dealt: false, deal: nil, my_bit: nil}
       participants = Map.put(participants, id, participant)
       new = %{data | participants: participants}
       new = Map.update!(new, :user_number, &(&1+1))
@@ -69,6 +69,7 @@ defmodule DoubleAuction do
     new = case action do
       "fetch_contents" -> Participant.fetch_contents(data, id)
       "bid" -> Participant.bid(data, id, params)
+      "select" -> Participant.select(data, id, params)
     end
     wrap_result(data, new)
   end

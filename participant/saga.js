@@ -1,6 +1,6 @@
 import { take, put, fork } from 'redux-saga/effects'
 
-import { bid } from './actions'
+import { bid, select } from './actions'
 
 function* bidSaga() {
   while (true) {
@@ -9,8 +9,16 @@ function* bidSaga() {
   }
 }
 
+function* selectSaga() {
+  while (true) {
+    const { payload } = yield take(`${select}`)
+    sendData('select', payload)
+  }
+}
+
 function* saga() {
   yield fork(bidSaga)
+  yield fork(selectSaga)
 }
 
 export default saga

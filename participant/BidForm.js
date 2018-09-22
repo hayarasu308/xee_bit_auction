@@ -63,13 +63,13 @@ class BidForm extends Component {
   }
 
   setErrorText(role, numValue) {
-    if (isNaN(numValue)) {
+    if (isNaN(numValue) || numValue <= 0) {
       this.setState({ errorText: InsertVariable(ReadJSON().static_text["error_text"][0], {}, this.props.dynamic_text["variables"])})
     } else {
       if (role == "buyer") {
         this.setState({ errorText: InsertVariable(ReadJSON().static_text["error_text"][1], {}, this.props.dynamic_text["variables"])})
       } else {
-        this.setState({ errorText: InsertVariable(ReadJSON().static_text["error_text"][0], {}, this.props.dynamic_text["variables"])})
+        this.setState({ errorText: InsertVariable(ReadJSON().static_text["error_text"][2], {}, this.props.dynamic_text["variables"])})
       }
     }
   }

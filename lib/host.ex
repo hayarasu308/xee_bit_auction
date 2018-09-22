@@ -1,4 +1,4 @@
-defmodule DoubleAuction.Host do
+defmodule BitAuction.Host do
   def filter_data(data) do
     rule = %{
       mode: true,
@@ -47,7 +47,8 @@ defmodule DoubleAuction.Host do
           bidded: false,
           bid: nil,
           dealt: false,
-          deal: nil
+          deal: nil,
+          my_bid: nil
         }
       else
         %{
@@ -59,7 +60,8 @@ defmodule DoubleAuction.Host do
           bidded: false,
           bid: nil,
           dealt: false,
-          deal: nil
+          deal: nil,
+          my_bid: nil
         }
       end
       {{id, new_participant}, acc + 1}

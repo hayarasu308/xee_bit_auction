@@ -374,6 +374,10 @@ class App extends Component {
             lowestBid={lowestBid}
             expanded={false}
             dynamic_text={dynamic_text}
+            role={"host"}
+            money={0}
+            bidded={true}
+            dispatch={null}
           />
           <Divider
             style={{

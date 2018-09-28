@@ -4,15 +4,18 @@ import throttle from 'react-throttle-render'
 import clone from 'clone'
 
 import { Card, CardHeader, CardText } from 'material-ui/Card'
+import RaisedButton from 'material-ui/RaisedButton'
 
 import { ReadJSON, InsertVariable, LineBreak } from '../util/ReadJSON'
 import { select } from '../participant/actions' 
 
-const BidsTable = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, expanded, dynamic_text, role, money, bidded, dispatch, use_money }) => {
+const BidsTable = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, expanded, dynamic_text, role, money, bidded, dispatch, use_money, deal, dealt }) => {
   const rows = []
   const length = Math.max.apply(null, [buyerBids, sellerBids, deals].map(a => a.length))
   const maxValue = highestBid ? highestBid.bid : 0
   const minValue = lowestBid ? lowestBid.bid : 0
+  let bidMoneyEqFlag = true
+  let dealMoneyEqFlag = true
   function get(map, key) {
     return map ? map[key] : null
   }
@@ -25,26 +28,59 @@ const BidsTable = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, expand
 
   const tableValue = (value, type) => {
     if (type == "deal" || !value) {
-      if (typeof get(value, "deal") === 'undefined') {
-        return ''
+      if (!get(value, "deal")) {
+        return null
       } else {
-        return get(value, "deal")
+        let color = "#000000"
+        if (deal == get(value, "deal") && dealMoneyEqFlag) {
+          dealMoneyEqFlag = false
+          color = "#FF0000"
+        }
+        return <RaisedButton
+          label={get(value, "deal")}
+          disabled={true}
+          disabledBackgroundColor={"#FFFFFF"}
+          disabledLabelColor={color}
+          style={{boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"}}
+        />
       }
     }
     let bid = get(value, "bid")
     
     if ((role == "seller" && bidded && type == "buyer"  && money <= bid)
      || (role == "buyer"  && bidded && type == "seller" && money >= bid)) {
-      let color = "#0000FF"
-      return (<span style={{ cursor: "pointer", color: color, textDecoration: "underline" }} onClick={handleOnClick.bind(value)}>
-        {bid}
-      </span>)
+      return (<RaisedButton
+        primary={true}
+        onClick={handleOnClick.bind(value)}
+        label={bid}
+      />)
+    }
+
+    if (role == type && money == bid && bidMoneyEqFlag && !dealt) {
+      bidMoneyEqFlag = false
+      return (<RaisedButton
+        disabled={true}
+        label={bid}
+        disabledLabelColor={"#FF8888"}
+      />)
     }
 
     if (typeof value === 'undefined') {
-      return ''
-    } else {
-      return bid
+      return null
+    } else if (role == "host") {
+      return (<RaisedButton
+          label={bid}
+          disabled={true}
+          disabledBackgroundColor={"#FFFFFF"}
+          disabledLabelColor={"#000000"}
+          style={{boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"}}
+        />)
+    }
+    else {
+      return (<RaisedButton
+        disabled={true}
+        label={bid}
+      />)
     }
   }
 
@@ -72,7 +108,9 @@ const BidsTable = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, expand
         showExpandableButton={true}
       />
       <CardText expandable={true}>
-        <table>
+        <table
+          style={{tableLayout:"fixed"}}
+        >
           <thead>
             <tr>
               <th>{dynamic_text["variables"]["buying_price"]}</th>

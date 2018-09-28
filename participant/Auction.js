@@ -95,6 +95,8 @@ const Auction = ({ buyerBids, sellerBids, deals, highestBid, lowestBid, role, mo
       bidded={bidded}
       dispatch={dispatch}
       use_money={use_money}
+      deal={deal}
+      dealt={dealt}
     />
   </div>
 )

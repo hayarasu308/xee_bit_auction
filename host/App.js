@@ -408,6 +408,8 @@ class App extends Component {
             bidded={true}
             dispatch={null}
             use_money={use_money}
+            deal={0}
+            dealt={false}
           />
           <Divider
             style={{
